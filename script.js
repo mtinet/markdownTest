@@ -140,6 +140,8 @@ const updatePreview = () => {
   preview.innerHTML = renderMarkdown(input.value);
 };
 
+input.addEventListener("input", updatePreview);
+
 resetButton.addEventListener("click", () => {
   input.value = sampleMarkdown;
   updatePreview();
