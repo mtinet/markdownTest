@@ -6,8 +6,8 @@ const sampleMarkdown = `# 안녕, Markdown!
 
 ## 할 일 목록
 - [x] 제목 문법 테스트
-- [ ] 링크 추가하기
-- [ ] 코드 블록 확인하기
+- [ ] 이미지 추가하기
+- [ ] 유튜브 링크 확인하기
 
 ## 일반 목록
 1. 첫 번째 항목
@@ -15,6 +15,10 @@ const sampleMarkdown = `# 안녕, Markdown!
 3. 세 번째 항목
 
 [OpenAI](https://openai.com) 링크도 지원합니다.
+
+![샘플 이미지](https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=900&q=80)
+
+https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 \`인라인 코드\`는 이렇게 쓰고, 코드 블록은 아래처럼 작성해요.
 
@@ -38,10 +42,48 @@ const escapeHtml = (value) =>
 
 const renderInline = (value) =>
   escapeHtml(value)
+    .replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, '<img src="$2" alt="$1" loading="lazy">')
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+
+const getYouTubeEmbedUrl = (value) => {
+  try {
+    const url = new URL(value.trim());
+    const host = url.hostname.replace(/^www\./, "").replace(/^m\./, "");
+    let videoId = "";
+
+    if (host === "youtu.be") {
+      videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    } else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+      if (url.pathname === "/watch") {
+        videoId = url.searchParams.get("v") || "";
+      } else {
+        const [, route, id] = url.pathname.split("/");
+        if (["embed", "shorts", "live"].includes(route)) {
+          videoId = id || "";
+        }
+      }
+    }
+
+    return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? `https://www.youtube.com/embed/${videoId}` : "";
+  } catch {
+    return "";
+  }
+};
+
+const renderYouTubeEmbed = (embedUrl) => `
+  <div class="youtube-embed">
+    <iframe
+      src="${embedUrl}"
+      title="YouTube video player"
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+`;
 
 const closeList = (state, html) => {
   if (!state.listType) {
@@ -115,7 +157,13 @@ const renderMarkdown = (markdown) => {
 
     closeList(state, html);
 
-    if (line.startsWith("### ")) {
+    const youtubeEmbedUrl = getYouTubeEmbedUrl(line.trim());
+    const youtubeLinkMatch = line.trim().match(/^\[[^\]]+\]\((https?:\/\/[^\s)]+)\)$/);
+    const youtubeLinkEmbedUrl = youtubeLinkMatch ? getYouTubeEmbedUrl(youtubeLinkMatch[1]) : "";
+
+    if (youtubeEmbedUrl || youtubeLinkEmbedUrl) {
+      html.push(renderYouTubeEmbed(youtubeEmbedUrl || youtubeLinkEmbedUrl));
+    } else if (line.startsWith("### ")) {
       html.push(`<h3>${renderInline(line.slice(4))}</h3>`);
     } else if (line.startsWith("## ")) {
       html.push(`<h2>${renderInline(line.slice(3))}</h2>`);
