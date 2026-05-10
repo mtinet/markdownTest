@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Markdown 문법 테스트</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app" aria-labelledby="page-title">
+      <section class="hero">
+        <p class="eyebrow">간단한 웹페이지 데모</p>
+        <h1 id="page-title">Markdown 문법 테스트</h1>
+        <p>
+          왼쪽 입력창에 마크다운을 써보세요. 제목, 목록, 코드, 인용문,
+          링크, 이미지, 유튜브 영상 문법을 오른쪽에서 바로 확인할 수 있습니다.
+        </p>
+      </section>
+
+      <section class="editor-grid" aria-label="마크다운 편집기와 미리보기">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>입력</h2>
+            <button id="reset-button" type="button">예제로 되돌리기</button>
+          </div>
+          <textarea id="markdown-input" spellcheck="false" aria-label="마크다운 입력"></textarea>
+        </article>
+
+        <article class="panel preview-panel">
+          <div class="panel-header">
+            <h2>미리보기</h2>
+            <span class="badge">Live Preview</span>
+          </div>
+          <div id="preview" class="preview" aria-live="polite"></div>
+        </article>
+      </section>
+
+      <section class="cheatsheet" aria-labelledby="cheatsheet-title">
+        <h2 id="cheatsheet-title">지원하는 문법</h2>
+        <ul>
+          <li><code># 제목</code>, <code>## 부제목</code></li>
+          <li><code>**굵게**</code>, <code>*기울임*</code>, <code>`인라인 코드`</code></li>
+          <li><code>- 목록</code>, <code>1. 번호 목록</code>, <code>- [x] 체크</code></li>
+          <li><code>&gt; 인용문</code>, <code>[링크](https://example.com)</code>, 코드 블록</li>
+          <li><code>![이미지](https://...)</code>, <code>https://youtu.be/영상ID</code></li>
+        </ul>
+        <p class="usage-note">
+          유튜브 영상은 <code>https://www.youtube.com/watch?v=영상ID</code> 또는
+          <code>https://youtu.be/영상ID</code>를 한 줄에 단독으로 입력하면 자동으로 임베드됩니다.
+        </p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
